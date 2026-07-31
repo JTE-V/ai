@@ -1,0 +1,13 @@
+{
+  "case": "internal-pip-audit",
+  "timestamp": "20260731-181814",
+  "key": "cve:CVE-2024-34064",
+  "component": "jinja2",
+  "cve": "CVE-2024-34064",
+  "severity": "high",
+  "rule": "fallback: 因素缺失,采用原文标注 level=high",
+  "factors_missing": true,
+  "decision": "immediate",
+  "priority": 6.0,
+  "reason": "critical/high → 立即告警 + 触发模板 04 利用链分析"
+}

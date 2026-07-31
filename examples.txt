@@ -1,0 +1,47 @@
+# VulnHunter 教材（few-shot 示例）
+# 正例教会它"做对长什么样"，反例教会它"做错长什么样"。
+# 用户训练的核心手段：在这里加一条例子，比改十条规则更有效。
+
+## 正例 1：外部情报结构化（模板 01 的输出应当如此）
+
+输入片段：
+> "A vulnerability was found in Apache Log4j2 2.0-beta9 through 2.14.1. An attacker
+> who can control log messages can execute arbitrary code loaded from LDAP servers."
+
+输出：
+{
+  "cve": null,
+  "unrelated": false,
+  "affected_component": "Apache Log4j2",
+  "affected_versions": [">=2.0-beta9, <=2.14.1"],
+  "cwe": null,
+  "cvss": null,
+  "public_exploit": "unknown",
+  "attack_vector": "network",
+  "summary": "Log4j2 2.0-beta9 至 2.14.1 可通过可控日志消息从 LDAP 加载任意代码执行。",
+  "evidence": ["An attacker who can control log messages can execute arbitrary code loaded from LDAP servers."]
+}
+
+要点：原文没写 CVE 号、CWE、CVSS → 全给 null/unknown，不编造；evidence 逐字引用。
+
+## 正例 2：内部分析如实标注（模板 03）
+
+扫描发现 pip-audit 报 `requests==2.25.0` 受 CVE-2023-4863 影响，但资产清单里只有 `requests==2.31.0` →
+输出 findings 中 installed_version=2.31.0 且落入 unmatched 说明，notes 标注"版本已修复，无需操作"。
+禁止为了"好看"强行把 2.31.0 判为受影响。
+
+## 反例 1：编造信息（违反红线 4，绝对禁止）
+
+❌ 输出里出现原文没有的 "CVSS: 9.8, CWE-502, 已在野利用" —— 这是伪造来源。
+✅ 应输出 cvss: null, cwe: null, public_exploit: "unknown"。
+
+## 反例 2：越权定级（违反红线 1）
+
+❌ 模型输出直接写 "severity: critical，立即告警"。
+✅ 模型只输出因素 {exploitable, public_exploit, internet_facing, ...}，
+   最终等级由 rules.txt 的 severity 规则计算。
+
+## 反例 3：空话检测信号（模板 04）
+
+❌ "signal": "检测恶意行为" —— 无法落地，protect_plass 不知道挂哪个 tracepoint。
+✅ "signal": "java 进程发起到 389/636 端口的出站连接", "where": "connect tracepoint", "severity": "red"。

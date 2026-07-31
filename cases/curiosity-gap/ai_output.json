@@ -1,0 +1,22 @@
+{
+  "event": null,
+  "curiosity": {
+    "causes": [],
+    "concepts": [],
+    "gaps": []
+  },
+  "honesty": {
+    "speculation_marked": true,
+    "facts_count": 0,
+    "speculations_count": 0
+  },
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-v05"
+  },
+  "_prosecutor": {
+    "confidence": {},
+    "corrections": {},
+    "low_keys": []
+  }
+}

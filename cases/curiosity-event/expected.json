@@ -1,0 +1,41 @@
+{
+  "event": "CVE-2024-34064: Jinja2 3.1.2 HTML attribute 转义缺陷，可能 XSS",
+  "curiosity": {
+    "causes": [
+      {
+        "hypothesis": "Jinja2 在 html attribute 语境下对引号/特殊字符的转义策略不完整，导致属性逃逸",
+        "basis": null,
+        "status": "speculative"
+      },
+      {
+        "hypothesis": "api-server 将用户输入渲染进 HTML attribute，若使用受影响版本则存在 XSS 面",
+        "basis": "来自输入原文：api-server 使用 3.1.2（internet_facing）",
+        "status": "inferred"
+      }
+    ],
+    "concepts": [
+      {
+        "concept": "模板引擎转义上下文缺陷（attribute context escaping flaw）",
+        "linked_to": ["XSS", "服务端模板注入", "此前同类：Mustache 属性转义问题"],
+        "novelty": "yes"
+      }
+    ],
+    "gaps": [
+      {
+        "gap": "3.1.2 具体哪个转义函数、哪个 attribute 场景存在缺陷",
+        "why_needed": "判断 api-server 的渲染路径是否实际触发",
+        "action": "查 CVE-2024-34064 的 commit/patch diff 与受影响函数"
+      },
+      {
+        "gap": "api-server 是否真的把用户输入渲染进 attribute（而不是只用于 text）",
+        "why_needed": "决定 exploitability 与应急优先级",
+        "action": "查 api-server 的模板使用点 / 代码检索"
+      }
+    ]
+  },
+  "honesty": {
+    "speculation_marked": true,
+    "facts_count": 1,
+    "speculations_count": 1
+  }
+}

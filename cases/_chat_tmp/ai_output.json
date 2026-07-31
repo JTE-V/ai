@@ -1,0 +1,37 @@
+{
+  "cve": null,
+  "unrelated": false,
+  "affected_component": "SQL",
+  "affected_versions": [
+    "UNKNOWN_RANGE"
+  ],
+  "cwe": null,
+  "cvss": null,
+  "public_exploit": "unknown",
+  "attack_vector": null,
+  "summary": "expected: {\"language\":\"PHP\",\"issues\":[{\"line\":\"2-3\",\"severity\":\"critical\",\"cwe\":\"CWE-89\",\"descriptio",
+  "evidence": [
+    "expected: {\"language\":\"PHP\",\"issues\":[{\"line\":\"2-3\",\"severity\":\"critical\",\"cwe\":\"CWE-89\",\"description\":\"SQL 注入: 直接将用户输入拼入 SQL 语句\",\"fix\":\"使用预处理语句: $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');\"},{\"line\":\"4\",\"severity\":\"high\",\"cwe\":\"CWE-79\",\"description\":\"XSS: 直接输出用户输入到 HTML\",\"fix\":\"使用 htmlspecialchars($_GET['name'], ENT_QUOTES)\"}],\"notes\":\"两个严重问题\"}"
+  ],
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-v01",
+    "latency_s": 0
+  },
+  "_prosecutor": {
+    "confidence": {
+      "affected_component": "high",
+      "affected_versions": "low",
+      "cvss": "unknown",
+      "cwe": "unknown",
+      "cve": "unknown",
+      "attack_vector": "unknown",
+      "public_exploit": "low"
+    },
+    "corrections": {},
+    "low_keys": [
+      "affected_versions",
+      "public_exploit"
+    ]
+  }
+}

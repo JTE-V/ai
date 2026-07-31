@@ -1,0 +1,1 @@
+{"language": "PHP", "issues": [{"line": "2-3", "severity": "critical", "cwe": "CWE-89", "description": "SQL注入", "fix": "使用预处理语句"}, {"line": "4", "severity": "high", "cwe": "CWE-79", "description": "XSS", "fix": "使用htmlspecialchars"}]}

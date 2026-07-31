@@ -1,0 +1,1 @@
+expected: {"language":"PHP","issues":[{"line":"2-3","severity":"critical","cwe":"CWE-89","description":"SQL 注入: 直接将用户输入拼入 SQL 语句","fix":"使用预处理语句: $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');"},{"line":"4","severity":"high","cwe":"CWE-79","description":"XSS: 直接输出用户输入到 HTML","fix":"使用 htmlspecialchars($_GET['name'], ENT_QUOTES)"}],"notes":"两个严重问题"}

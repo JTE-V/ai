@@ -1,0 +1,203 @@
+# ============================================================================
+# ai-query-framework 白名单配置
+# 文件: config/whitelist.yaml
+# 描述: 定义框架允许访问的 API、域名、数据库表、权限范围及调用频率限制。
+#       该配置由 query_guardian.py 的 WhiteListGuard 在每次查询执行前加载
+#       并校验——任何不在白名单中的资源访问将被拒绝并记录审计事件。
+# 版本: 1.0.0
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 全局开关
+# ----------------------------------------------------------------------------
+global:
+  # 白名单执行模式:
+  #   strict   — 白名单外的所有访问一律拒绝（生产推荐）
+  #   audit    — 白名单外访问放行但记录 WARN 审计日志（调试/灰度）
+  #   disabled — 完全关闭白名单检查（仅限本地开发，严禁生产启用）
+  mode: "strict"
+
+  # 当命中拒绝规则时是否立即发送告警通知
+  alert_on_violation: true
+
+  # 违规事件保留天数（用于审计回溯）
+  audit_retention_days: 90
+
+# ----------------------------------------------------------------------------
+# API 白名单
+# 列出框架允许调用的所有外部/内部 API 名称。
+# 每个模板 sources[].name 引用的 API 必须在此处注册，
+# 否则 query_guardian 在编译阶段即拒绝该模板。
+# ----------------------------------------------------------------------------
+api_whitelist:
+  # --- 财报报告 API ---
+  # 对应模板 template_financial.yaml 中的 financial_api 源
+  - name: "financial_reporting_api"               # API 标识（与模板 sources[].name 对应）
+    description: "公司财报核心数据接口 — 提供营收、利润等财务指标"
+    owner: "data-platform-team"                   # 负责团队
+    base_url: "https://api.example.com"           # 基础 URL，用于出站请求校验
+    auth_method: "api_key"                        # 鉴权方式: api_key / oauth2 / mtls / none
+    allowed_methods: ["GET"]                      # 允许的 HTTP 方法
+    requires_approval: false                      # 首次使用是否需要审批
+    enabled: true                                 # 是否启用
+
+  # --- 补充数据库 API ---
+  # 对应模板 template_financial.yaml 中的 supplement_db 源
+  - name: "supplement_database_api"               # API 标识
+    description: "财报补充数据接口 — 当主 API 缺失字段时用于填补"
+    owner: "data-platform-team"
+    base_url: "https://data.example.com"          # 补充库所在域名
+    auth_method: "mtls"                           # 使用双向 TLS 证书认证
+    allowed_methods: ["POST"]                     # 补充查询使用 POST（承载 SQL）
+    requires_approval: true                       # 需要审批才能接入
+    enabled: true
+
+# ----------------------------------------------------------------------------
+# 域名白名单
+# 框架发起的任何出站 HTTP/gRPC 请求，其目标域名必须在此列表中。
+# 支持精确匹配和通配符（*.example.com）。
+# 该列表也约束 redirect 跟随——重定向目标同样需要匹配。
+# ----------------------------------------------------------------------------
+domain_whitelist:
+  - domain: "api.example.com"                     # 财报主 API 域名
+    description: "公司财报核心 API 服务"
+    ports: [443]                                  # 允许的端口，空列表表示任意端口
+    protocol: "https"                             # 协议: https / http / grpc
+    ip_verification: true                         # 是否对 DNS 解析结果做 IP 范围校验
+
+  - domain: "data.example.com"                    # 补充数据库 API 域名
+    description: "补充数据服务"
+    ports: [443]
+    protocol: "https"
+    ip_verification: true
+
+  # 示例: 通配符域名（预留给未来扩展，当前注释）
+  # - domain: "*.internal.example.com"
+  #   description: "内部微服务集群"
+  #   ports: [443, 8443]
+  #   protocol: "https"
+
+# ----------------------------------------------------------------------------
+# 数据库表白名单
+# 列出框架允许查询的数据库表（含 schema）。
+# 格式: <schema>.<table>；支持通配符 *（如 financials.* 表示该 schema 下全部表）。
+# 每个模板 sources 中的 SQL 查询会被静态解析并逐一校验。
+# ----------------------------------------------------------------------------
+table_whitelist:
+  - table: "financials.reports"                   # 财报报告主表
+    description: "公司财报核心数据表 — 每行代表一份已发布的财务报告"
+    allowed_operations: ["SELECT"]                # 允许的操作: SELECT / INSERT / UPDATE / DELETE
+    row_limit_per_query: 100                      # 单次查询最大返回行数
+    column_mask: []                               # 需要脱敏的列名（空 = 全部可见）
+    sensitive: true                               # 是否为敏感表（敏感表访问会触发审计日志）
+    owner: "data-platform-team"
+
+  - table: "financials.metrics"                   # 财务指标表
+    description: "财务指标宽表 — 包含计算后的派生指标（毛利率、ROE 等）"
+    allowed_operations: ["SELECT"]
+    row_limit_per_query: 500
+    column_mask: []                               # 当前无脱敏列
+    sensitive: true
+    owner: "data-platform-team"
+
+  # 示例: 通配符灰度规则（当前注释）
+  # - table: "public.*"
+  #   description: "公共 schema 下的所有表（仅供开发环境）"
+  #   allowed_operations: ["SELECT"]
+  #   row_limit_per_query: 1000
+
+# ----------------------------------------------------------------------------
+# 权限范围 (Permission Scopes)
+# 定义查询可以持有的最大权限级别。每个用户 / API Key 绑定的 scope
+# 与此处定义的交集决定了实际执行权限。
+# ----------------------------------------------------------------------------
+permission_scopes:
+  # --- 只读权限 ---
+  # 适用于: 普通用户、报表查看者、Dashboard
+  - scope: "read_only"
+    description: "只读权限 — 仅允许 SELECT 操作，不能修改任何数据"
+    allowed_operations: ["SELECT"]
+    # 此 scope 可以访问的 API
+    allowed_apis: ["financial_reporting_api", "supplement_database_api"]
+    # 此 scope 可以访问的表
+    allowed_tables: ["financials.reports", "financials.metrics"]
+    # 是否允许访问补充数据源（supplement_db）
+    allow_supplement_sources: true
+    # 最大并发查询数
+    max_concurrent_queries: 5
+
+  # --- 读写权限 ---
+  # 适用于: 数据管理员、ETL 任务
+  - scope: "read_write"
+    description: "读写权限 — 允许 SELECT 和有限的 INSERT/UPDATE 操作"
+    allowed_operations: ["SELECT", "INSERT", "UPDATE"]
+    allowed_apis: ["financial_reporting_api", "supplement_database_api"]
+    allowed_tables: ["financials.reports", "financials.metrics"]
+    allow_supplement_sources: true
+    max_concurrent_queries: 10
+    # 写操作是否需要额外审批
+    write_requires_approval: true
+
+  # --- 管理权限（预留，当前注释） ---
+  # - scope: "admin"
+  #   description: "管理权限 — 允许所有操作，包括 DDL"
+  #   allowed_operations: ["SELECT", "INSERT", "UPDATE", "DELETE", "DDL"]
+  #   allowed_apis: ["*"]
+  #   allowed_tables: ["*"]
+  #   max_concurrent_queries: 50
+
+# ----------------------------------------------------------------------------
+# 调用频率限制 (Rate Limiting)
+# 令牌桶算法实现。每个 API 或用户可独立配置。
+# 超出限制的请求返回 HTTP 429，并在响应头中携带 X-RateLimit-* 信息。
+# ----------------------------------------------------------------------------
+rate_limits:
+  # --- 全局默认限制 ---
+  # 当某 API 无专属配置时使用此默认值
+  default:
+    requests_per_second: 5                        # 每秒允许的请求数
+    burst_size: 10                                # 突发容量（令牌桶上限）
+    cooldown_seconds: 60                          # 触发限流后的冷却时间
+    scope: "per_api_key"                          # 粒度: per_api_key / per_ip / per_user / global
+
+  # --- 财报 API 专用限制 ---
+  - target: "financial_api"                       # 目标: API 名称（对应 api_whitelist.name）
+    requests_per_second: 10                       # 10 次/秒
+    burst_size: 20                                # 最多突发 20 次
+    cooldown_seconds: 30
+    scope: "per_api_key"
+    description: "财报 API 限流 — 10 req/s，突发上限 20"
+
+  # --- 补充数据库 API 专用限制 ---
+  - target: "supplement_database_api"
+    requests_per_second: 3                        # 补充库为共享资源，限制较严
+    burst_size: 5
+    cooldown_seconds: 120
+    scope: "per_api_key"
+    description: "补充数据库 API 限流 — 3 req/s，触发限流后冷却 2 分钟"
+
+  # --- 按用户角色的限制（示例性附加规则） ---
+  # 若同时匹配多条规则，取最严格的值
+  - target: "role:read_only"                      # 目标也可以是 role:<name>
+    requests_per_second: 2
+    burst_size: 5
+    cooldown_seconds: 60
+    scope: "per_user"
+    description: "只读角色全局限制 — 2 req/s"
+
+  - target: "role:read_write"
+    requests_per_second: 8
+    burst_size: 15
+    cooldown_seconds: 30
+    scope: "per_user"
+    description: "读写角色全局限制 — 8 req/s"
+
+# ----------------------------------------------------------------------------
+# IP / 网络范围白名单（可选扩展）
+# 预留配置段，用于限制请求来源 IP。当前未启用但保留结构。
+# ----------------------------------------------------------------------------
+# ip_whitelist:
+#   - cidr: "10.0.0.0/8"
+#     description: "内网 A 类地址段"
+#   - cidr: "172.16.0.0/12"
+#     description: "内网 B 类地址段"

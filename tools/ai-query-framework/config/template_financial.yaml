@@ -1,0 +1,235 @@
+# ============================================================================
+# ai-query-framework 公司财报查询模板
+# 文件: config/template_financial.yaml
+# 描述: 定义公司财报数据查询的输入/输出规格、数据源路由、算法流水线
+#       以及降级策略。该模板由 template_engine.py 在运行时加载并编译为
+#       可执行的查询计划。
+# 版本: 1.0.0
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 模板元信息
+# ----------------------------------------------------------------------------
+template:
+  name: "financial_report_query"                 # 模板唯一标识名
+  version: "1.0.0"                                # 语义化版本号
+  description: "公司财报查询模板 — 支持按公司名、年份、报告类型检索营收与利润数据"
+  category: "financial"                           # 分类标签，供模板索引检索
+  ttl_seconds: 3600                               # 查询结果缓存有效期（秒）
+
+# ----------------------------------------------------------------------------
+# 输入字段定义
+# 每个字段声明其名称、类型、是否必填、校验规则和默认值。
+# 类型白名单: STRING | INTEGER | FLOAT | BOOLEAN | DATE | ENUM
+# ----------------------------------------------------------------------------
+inputs:
+  - name: company_name                            # 字段名: 公司名称
+    type: STRING                                  # 数据类型
+    required: true                                # 是否必填
+    description: "待查询的公司全称，例如 Apple Inc."
+    validation:
+      min_length: 1                               # 最小长度（字符）
+      max_length: 200                             # 最大长度
+      pattern: "^[\\w\\s\\.,&\\(\\)\\-]+$"         # 安全正则：字母、数字、空格、常用符号
+    default: null                                 # 无默认值，必须由调用方提供
+
+  - name: year                                    # 字段名: 财年
+    type: INTEGER                                 # 数据类型
+    required: true
+    description: "查询的财年年份，例如 2024"
+    validation:
+      min: 2000                                   # 可接受的最早年份
+      max: 2099                                   # 可接受的最晚年份
+    default: null
+
+  - name: report_type                             # 字段名: 报告类型
+    type: ENUM                                    # 枚举类型
+    required: false                               # 可选字段
+    description: "报告周期类型: annual=年报, quarterly=季报"
+    enum_values: ["annual", "quarterly"]           # 允许的枚举值
+    default: "annual"                             # 未指定时默认查询年报
+
+# ----------------------------------------------------------------------------
+# 查询源定义
+# 声明模板所依赖的数据源，每个源包含连接信息、参数映射和可选的 fallback。
+# 引擎按声明顺序尝试：若前一源返回不可恢复的错误，则尝试下一源。
+# ----------------------------------------------------------------------------
+sources:
+  # --- 主数据源: 财报 API ---
+  - name: financial_api                           # 源标识
+    type: rest                                    # 源类型: rest / grpc / graphql
+    required: true                                # 是否为必需源（false 则标记为 supplement）
+    description: "公司财报 REST API，提供营收、利润等核心财务指标"
+    connection:
+      endpoint: "https://api.example.com/v2/financials/reports"
+      method: GET                                 # HTTP 方法
+      timeout_ms: 5000                            # 超时（毫秒）
+      retry:
+        max_attempts: 3                           # 最大重试次数
+        backoff: "exponential"                    # 退避策略: exponential / linear / fixed
+        initial_delay_ms: 200                     # 首次重试延迟
+    params:
+      # 将模板输入字段映射为 API 查询参数
+      symbol: "{{ .inputs.company_name }}"        # 模板占位符 → API 参数
+      year: "{{ .inputs.year }}"
+      type: "{{ .inputs.report_type }}"
+    headers:
+      Accept: "application/json"
+      X-API-Key: "{{ .secrets.financial_api_key }}" # 从密钥管理器注入
+      X-Request-Id: "{{ .trace.id }}"              # 追踪 ID，用于全链路日志
+    auth:
+      type: api_key                               # 鉴权方式
+      header_name: "X-API-Key"                    # 承载密钥的 Header 名
+    output_mapping:                               # 将 API 响应映射到内部 schema
+      revenue: "$.data.total_revenue"
+      profit: "$.data.net_profit"
+      growth_rate: "$.data.yoy_growth_pct"
+      report_date: "$.data.report_end_date"
+      summary: "$.data.executive_summary"
+
+  # --- 补充数据源: 缓存/归档数据库（可选） ---
+  - name: supplement_db                           # 源标识
+    type: sql                                     # 源类型: sql / nosql
+    required: false                               # 标记为 optional，失败不阻塞整体查询
+    description: "补充数据库 — 当 API 返回数据不完整时用于填补缺失字段"
+    connection:
+      driver: "postgres"                          # 数据库驱动
+      dsn: "{{ .secrets.supplement_db_dsn }}"     # 数据源名称，从密钥管理器注入
+      timeout_ms: 3000
+    query: |                                      # 参数化 SQL 查询
+      SELECT total_revenue, net_profit, yoy_growth_pct,
+             report_end_date, executive_summary
+      FROM financials.reports
+      WHERE company_name = {{ .inputs.company_name | quote }}
+        AND fiscal_year   = {{ .inputs.year }}
+        AND report_type   = {{ .inputs.report_type | quote }}
+      LIMIT 1
+    output_mapping:                               # 列名 → 内部字段
+      revenue: "total_revenue"
+      profit: "net_profit"
+      growth_rate: "yoy_growth_pct"
+      report_date: "report_end_date"
+      summary: "executive_summary"
+
+# ----------------------------------------------------------------------------
+# 输出 Schema
+# 定义查询的最终输出结构，供下游消费者（UI、报表、API 响应）参考。
+# 类型: NUMBER / STRING / DATE / OBJECT / ARRAY
+# ----------------------------------------------------------------------------
+output_schema:
+  - name: revenue                                 # 总营收
+    type: NUMBER
+    description: "报告期内的总营业收入（单位：元）"
+    format: "decimal(18,2)"                       # 精度格式
+    nullable: false
+
+  - name: profit                                  # 净利润
+    type: NUMBER
+    description: "报告期内的净利润（单位：元）"
+    format: "decimal(18,2)"
+    nullable: false
+
+  - name: growth_rate                             # 同比增长率
+    type: NUMBER
+    description: "与上年同期相比的增长率，以小数表示（如 0.15 = 15%）"
+    format: "decimal(6,4)"
+    nullable: true                                # 首年数据可能无同比
+
+  - name: report_date                             # 报告截止日期
+    type: DATE
+    description: "报告期间截止日期，格式 YYYY-MM-DD"
+    format: "date"
+    nullable: false
+
+  - name: summary                                 # 管理层总结
+    type: STRING
+    description: "管理层对报告期经营情况的文字总结"
+    max_length: 5000
+    nullable: true
+
+# ----------------------------------------------------------------------------
+# 算法房间 (Algorithm Rooms)
+# 定义数据在模板内的处理流水线。每个"房间"是一个独立的处理阶段，
+# 上游房间的输出是下游房间的输入。"房间"模型使处理步骤可插拔、可观测。
+# 执行顺序: merge → rank → llm_summarize
+# ----------------------------------------------------------------------------
+algorithm_rooms:
+  # --- 房间 1: merge ---
+  # 职责: 合并多个数据源的返回结果。按优先级取第一个非空值，
+  #       确保最终数据集的完整性。
+  - name: merge
+    order: 1
+    description: "合并 financial_api 与 supplement_db 的结果，缺失字段由补充源填补"
+    strategy: "coalesce"                          # 合并策略: coalesce(优先级) / merge(深度合并) / first_valid
+    rules:
+      - field: "revenue"
+        priority: ["financial_api", "supplement_db"] # 优先取 API，API 无值则取数据库
+      - field: "profit"
+        priority: ["financial_api", "supplement_db"]
+      - field: "growth_rate"
+        priority: ["financial_api", "supplement_db"]
+      - field: "report_date"
+        priority: ["financial_api", "supplement_db"]
+      - field: "summary"
+        priority: ["financial_api", "supplement_db"]
+
+  # --- 房间 2: rank ---
+  # 职责: 对结果进行排序/评分。财报场景下可基于数据完整度、时效性打分，
+  #       供下游选择最优结果。
+  - name: rank
+    order: 2
+    description: "基于数据完整度与时效性对结果评分排序"
+    criteria:
+      - name: "completeness"                      # 完整度权重: 非空字段数 / 总字段数
+        weight: 0.6
+        evaluator: "field_fill_ratio"
+      - name: "freshness"                         # 时效性权重: 报告日期距今天数越近越好
+        weight: 0.4
+        evaluator: "recency_score"
+    output_mode: "best"                           # best: 仅返回最高分 / top_k: 返回前 k 条
+
+  # --- 房间 3: llm_summarize ---
+  # 职责: 使用大语言模型对财报数据生成自然语言摘要，
+  #       方便非财务背景的用户理解。
+  - name: llm_summarize
+    order: 3
+    description: "调用 LLM 对财报关键指标生成易读的自然语言摘要"
+    llm_config:
+      model: "{{ .config.llm_model | default \"gpt-4o-mini\" }}"
+      max_tokens: 300
+      temperature: 0.3                            # 低温度保证摘要稳定一致
+      system_prompt: |
+        你是一位资深财务分析师。请根据提供的财报数据，用简洁的中文
+        概括公司的经营表现。重点突出营收变化、利润趋势和值得关注的要点。
+        控制在 150 字以内。
+    prompt_template: |
+      公司: {{ .inputs.company_name }}
+      财年: {{ .inputs.year }}
+      报告类型: {{ .inputs.report_type }}
+      营收: {{ .output.revenue }} 元
+      净利润: {{ .output.profit }} 元
+      同比增长率: {{ .output.growth_rate | printf "%.2f%%" }}
+      报告截止日期: {{ .output.report_date }}
+
+      请生成财报摘要。
+    fallback_on_llm_error: true                   # LLM 调用失败时不阻塞，使用降级模板
+
+# ----------------------------------------------------------------------------
+# 降级模板 (Fallback Template)
+# 当所有数据源均失败、或算法房间抛出不可恢复的错误时，
+# 引擎使用此预制回答替代真实查询结果，避免向用户裸奔错误。
+# ----------------------------------------------------------------------------
+fallback:
+  strategy: "preset_text"                         # 降级策略: preset_text / empty / error_passthrough
+  preset_response:
+    revenue: 0
+    profit: 0
+    growth_rate: null
+    report_date: null
+    summary: |
+      很抱歉，当前无法获取 {{ .inputs.company_name }} 的 {{ .inputs.year }} 年
+      {{ if eq .inputs.report_type "quarterly" }}季报{{ else }}年报{{ end }}数据。
+      可能的原因包括：数据源暂时不可用、公司名称拼写有误、或该年份财报尚未发布。
+      请稍后重试或联系数据管理员。
+  log_level: "WARN"                               # 降级时日志级别: DEBUG / INFO / WARN / ERROR
+  alert_on_fallback: true                         # 降级时是否触发告警通知

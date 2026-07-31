@@ -1,0 +1,27 @@
+# VulnHunter 数据源清单（它的"感官"）
+# 凭据一律走环境变量注入，本文件不出现任何密钥（红线 2）。
+
+## 外部情报源（公开）
+
+| 源 | 接口 | 用途 |
+|---|---|---|
+| NVD | https://services.nvd.nist.gov/rest/json/cves/2.0 | 权威 CVE 元数据 + CVSS |
+| OSV.dev | https://api.osv.dev/v1/query | 多生态漏洞（PyPI/npm/GitHub 等） |
+| GitHub Security Advisories | https://api.github.com/advisories | 仓库级公告（含内部依赖） |
+| CISA KEV | https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json | 已知被利用目录 → L3 必查 |
+| 厂商公告页 | 各自官方页（永驻监听 diff） | 新公告 30s 内捕获变化 |
+
+## 内部源（自家环境）
+
+| 源 | 内容 | 采集方式 |
+|---|---|---|
+| CI 依赖扫描 | pip-audit / npm audit / trivy 输出 | CI 步骤挂载 |
+| 资产清单 | 服务/主机/版本/暴露面(exposure) | 手工维护或 CMDB 导出 |
+| 版本清单 | requirements.txt / package-lock.json / 镜像 tag | 仓库内文件 |
+| syslog / 运行日志 | 异常行为信号（配合 protect_plass） | 日志管道 |
+
+## 去重归并规则（pipeline 第 2 步）
+
+- 同一 cve 多源出现 → 以 NVD 为准，其余源补充 evidence
+- 同一漏洞不同 cve（如变体）→ 按组件+版本区间合并，保留全部 cve 列表
+- 归并后至少保留 1 条原始来源，禁止丢弃来源信息（红线 4）

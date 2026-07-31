@@ -1,0 +1,6 @@
+{"query_id":"q1","session_id":"5ba4ed9a47c74ce590753bc68d7b6608","timestamp":"2026-07-29T11:56:10.253Z","template_name":"test","query_sources":[],"duration_ms":100,"result_summary":"ok","degradation_level":0,"errors":[],"metadata":{}}
+{"query_id":"q0","session_id":"s0","timestamp":"2026-07-29T12:22:08.925Z","template_name":"test","query_sources":[],"duration_ms":100,"result_summary":"r0","degradation_level":0,"errors":[],"metadata":{}}
+{"query_id":"q1","session_id":"s1","timestamp":"2026-07-29T12:22:08.926Z","template_name":"test","query_sources":[],"duration_ms":150,"result_summary":"r1","degradation_level":0,"errors":[],"metadata":{}}
+{"query_id":"q2","session_id":"s2","timestamp":"2026-07-29T12:22:08.928Z","template_name":"test","query_sources":[],"duration_ms":200,"result_summary":"r2","degradation_level":0,"errors":[],"metadata":{}}
+{"query_id":"q3","session_id":"s3","timestamp":"2026-07-29T12:22:08.929Z","template_name":"test","query_sources":[],"duration_ms":250,"result_summary":"r3","degradation_level":0,"errors":[],"metadata":{}}
+{"query_id":"q4","session_id":"s4","timestamp":"2026-07-29T12:22:08.930Z","template_name":"test","query_sources":[],"duration_ms":300,"result_summary":"r4","degradation_level":0,"errors":[],"metadata":{}}

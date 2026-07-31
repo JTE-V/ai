@@ -1,0 +1,31 @@
+{
+  "event": null,
+  "curiosity": {
+    "causes": [
+      {
+        "hypothesis": "api-server 可能已经暴露在 XSS 风险中",
+        "basis": null,
+        "status": "speculative"
+      }
+    ],
+    "concepts": [
+      {
+        "concept": "模板转义缺陷模式",
+        "linked_to": ["XSS"],
+        "novelty": "no"
+      }
+    ],
+    "gaps": [
+      {
+        "gap": "版本基线可能过期",
+        "why_needed": "判断",
+        "action": ""
+      }
+    ]
+  },
+  "honesty": {
+    "speculation_marked": true,
+    "facts_count": 0,
+    "speculations_count": 1
+  }
+}

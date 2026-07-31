@@ -1,0 +1,27 @@
+2026-07-31T17:28:45 | CVE-2021-44228 | E01 | 注入 templates/01_vuln_analysis.txt | applied
+2026-07-31T17:28:49 | CVE-2021-44228 | E01 | re-verify | PASS
+2026-07-31T17:29:28 | CVE-2021-44228 | ? | unattributable | tolerated
+2026-07-31T18:47:01 | _train_20260731-184538 | ? | unattributable | tolerated
+2026-07-31T18:47:05 | CVE-2021-44228 | ? | unattributable | tolerated
+2026-07-31T19:01:03 | _train_20260731-184538 | ? | unattributable | tolerated
+2026-07-31T19:01:06 | CVE-2021-44228 | ? | unattributable | tolerated
+2026-07-31T19:01:22 | _train_20260731-184538 | ? | unattributable | tolerated
+2026-07-31T19:01:26 | CVE-2021-44228 | ? | unattributable | tolerated
+2026-07-31T19:14:10 | _train_20260731-191348 | ? | unattributable | tolerated
+2026-07-31T19:14:11 | _train_20260731-191403 | E06 | 注入 templates/03_internal_scan.txt | applied
+2026-07-31T19:14:11 | _train_20260731-191403 | E04 | 注入 rules.txt | applied
+2026-07-31T19:14:11 | _train_20260731-191403 | E06 | 跳过(已含 '自动修复(E06)') | applied
+2026-07-31T19:14:11 | _train_20260731-191403 | E04 | 跳过(已含 '自动修复(E04)') | applied
+2026-07-31T19:14:11 | _train_20260731-191403 | E06+E04 | re-verify | tolerated
+2026-07-31T19:14:46 | _train_20260731-191428 | ? | unattributable | tolerated
+2026-07-31T19:37:40 | _train_20260731-193543 | ? | unattributable | tolerated
+2026-07-31T19:40:02 | _train_20260731-193907 | E03 | 注入 templates/02_severity_factors.txt | applied
+2026-07-31T19:40:04 | _train_20260731-193907 | E03 | 跳过(已含 '自动修复(E03)') | applied
+2026-07-31T19:40:05 | _train_20260731-193907 | E03 | re-verify | tolerated
+2026-07-31T19:53:16 | _train_20260731-195305 | E03 | 跳过(已含 '自动修复(E03)') | applied
+2026-07-31T19:53:16 | _train_20260731-195305 | E03 | 跳过(已含 '自动修复(E03)') | applied
+2026-07-31T19:53:17 | _train_20260731-195305 | E03 | re-verify | tolerated
+2026-07-31T19:57:20 | _train_20260731-195611 | ? | unattributable | tolerated
+2026-07-31T20:34:59 | code-php-injection | E03 | 跳过(已含 '自动修复(E03)') | applied
+2026-07-31T20:34:59 | code-php-injection | E03 | 跳过(已含 '自动修复(E03)') | applied
+2026-07-31T20:34:59 | code-php-injection | E03 | re-verify | tolerated

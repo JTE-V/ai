@@ -1,0 +1,51 @@
+# VulnHunter 狩猎管道（文本 DAG 定义）
+# 每一层只做一件事，层间通过 QueryContext 传递不可变数据。
+# 与 protect_plass 五层防护同构：采样→背压→内存→看门狗→降级。
+
+```
+外部情报源 ──────────────┐
+                        ▼
+内部扫描源 ───────────▶ 采集层
+                        │  多源并行抓取（asyncio.gather 类比）
+                        ▼
+                      去重归并
+                        │  同一 cve 多源报道 → 合并一条（保留全部来源）
+                        ▼
+                     L1 缓存
+                        │  命中 → 直接返回（不调模型）
+                        ▼
+                     L2 粗筛 ──规则(routing)→ 不匹配 → 归档
+                        │  组件 + 版本区间相交？
+                        ▼
+                     L3 精筛（LLM）
+                        │  模板01 结构化 + 模板02 因素提取
+                        ▼
+                  严重性计算 ──规则(severity)
+                        │
+        ┌───────────────┼────────────────┐
+        ▼               ▼                ▼
+   critical/high    medium           low
+        │             │                │
+        ▼             ▼                ▼
+  立即告警+        每日汇总         归档
+  模板04利用链       (去重合并)
+  深度分析
+        │
+        ▼
+  检测信号 → protect_plass 监测建议（execve/connect/openat/...）
+        │
+        ▼
+  审计归档：cve + 判断 + meta(provider/model/latency/tokens) + evidence
+```
+
+## 贯穿全程的守护（QueryGuardian）
+
+- 看门狗：单次查询 deadline 30s，超时重试 ≤2 次，连续失败熔断
+- 背压：情报爆发日（如 Log4Shell）并发 10 / QPS 20 令牌桶，溢出降级排队
+- 审计：每跳都有 trace id，error 绝不静默（红线 3）
+
+## 执行策略
+
+- 外部源抓取失败 → 记录并继续其他源（不静默），该源标 degraded
+- L3 模型不可用 → 走降级策略（rules.txt 第 3 节），meta.degraded=true
+- 低危情报不进模型：省 token，且符合"渐进式查询"哲学

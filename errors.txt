@@ -1,0 +1,23 @@
+# 错误词典 — 思考的"错题本"
+# 每一条 = 一个已观察到的错误模式。当 verify.py 判卷 FAIL 时，按 E-code 定位、修正、再验证。
+# 这是"思考"的燃料：没有错误的记录，就没有训练。
+
+| E-code | 症状（verify 抓到的） | 根因 | 修正动作 | 验证手段 |
+|---|---|---|---|---|
+| E01 | cvss/cwe/cve 原文没有却填了值 | 模型用背景知识补全来源字段 | templates/01 加"只依据输入原文，背景知识填 null/unknown" | verify.py null 语义检查（规则 2） |
+| E02 | evidence 不是原文逐字引用 | 模型改写/美化来源 | templates/01 加"evidence 逐字引用" | verify.py evidence 子串检查（规则 4） |
+| E03 | 输出直接写 severity/等级 | 模型越权定级 | templates/02 明确"只输出因素，等级由 rules 计算" | 字段白名单检查（severity 不得出现在输出） |
+| E04 | 版本区间误判（装了修复版仍判受影响） | 规则缺少版本比较 | rules.txt severity 节加版本比较；templates/03 notes 标注 | 内部案例 expected 对照 |
+| E05 | 告警风暴 / 高危漏告 | alert 规则阈值不当 | rules.txt alert 节调阈值 | 回放历史数据统计 |
+| E06 | 内部扫描强行匹配不存在资产 | 模型"猜"资产 | templates/03 加"匹配不上进 unmatched" | matched_assets ⊆ 资产清单校验 |
+| E07 | unrelated 矛盾（无关输入却输出漏洞字段） | 模板条件分支漏判 | templates/01 加无关输入分支 | verify.py 规则 5 |
+| E08 | 推测伪装成事实（speculative 假设措辞像事实） | 好奇没有纪律，把假设写成断言 | templates/05 加"推测必须带可能/推测/待验证"措辞要求 | verify_curiosity speculative 标记检查 |
+| E09 | 无纪律发散（无事件却输出 causes/concepts；缺口缺 action） | 好奇退化成瞎想，求索不可行动 | templates/05 形态 C 分支：无事件只输出 gaps，缺口必须可行动 | verify_curiosity 形态约束检查 |
+
+## 使用流程（训练循环内）
+
+1. verify.py FAIL → 读问题行，定位 E-code（可多行对应多 E-code）
+2. 改对应模板/规则文本（一次只改一处，便于归因）
+3. 重跑 verify.py → 目标：该 case 从 FAIL 变 PASS
+4. 若重跑出现新错误 → 新错误是新 E-code 或旧修正过激（回退重来）
+5. PASS 后把"错误 → 修正 → 结果"记入 feedback_log.txt
