@@ -1,3 +1,5 @@
+# Memory Entity Protocol 
+[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg
 ## 人工智能
 # 你个可用人工训练的梦新.
 # 代码开源随便你们查。
