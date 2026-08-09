@@ -1,56 +1,35 @@
 # 梦新 — 可训练的 AI 框架
 
 > **不是算力堆出来的 AI，是你自己训出来的 AI。**
-> 下载压缩包 → 解压 → 自己训练你的职业 → 它越来越懂你。
+> 下载 → 解压 → 双击启动 → **对话里训练它** → 它越来越懂你。
 
 ## 📥 下载 & 开始
 
 1. 下载 **`用户框架交付包.zip`** → 解压
-2. 双击 **`start_mengxin.bat`** → 进入聊天室（直接打字问它）
-3. 没教过的问题它会自己联网学 + 记住
+2. 双击 **`start_mengxin.bat`**（或 `python -X utf8 chat.py`）→ 进入聊天室
+3. 直接打字问它（没教过的它会自己联网学 + 记住）
 
 ---
 
-## 🛠️ 训练你的职业（位置很明确）
+## 🛠️ 训练你的 AI（全程对话，不用碰文件！）
 
-### 第 1 步：创造职业（在解压目录里执行）
-```cmd
-cd vuln-hunter
-python new_domain.py "你的职业"
-```
-例：`python new_domain.py "钓鱼"` → 自动生成 `templates/钓鱼.txt`
+在聊天室里**一条消息发完**（复制下面改内容即可）：
 
-### 第 2 步：建案例（在 `cases\钓鱼-装备\` 文件夹里）
 ```
-cases\钓鱼-装备\
-├── input.txt       ← 写"用户会怎么问"
-└── expected.json   ← 写"想让它怎么答"
-```
-**input.txt**（问题）：
-```
-新手钓鱼买什么装备
-```
-**expected.json**（回答）：
-```json
-{
-  "area": "钓鱼",
-  "key_point": "装备",
-  "suggestions": ["鱼竿+线组+鱼饵"],
-  "disclaimer": "仅供参考, 不构成专业意见",
-  "evidence": ["新手钓鱼买什么装备"],
-  "unrelated": false
-}
+你> input: 新手钓鱼买什么装备 expected: {"area":"钓鱼","key_point":"装备","suggestions":["鱼竿+线组"],"disclaimer":"仅供参考, 不构成专业意见","evidence":["新手钓鱼买什么装备"],"unrelated":false}
+梦新> 学到了(案例: 对话训练-钓鱼-...),训练素材已存档。
 ```
 
-### 第 3 步：训练 + 判卷（在解压目录执行）
-```cmd
-python run_model.py cases\钓鱼-装备 --template templates\钓鱼.txt
-python verify.py cases\钓鱼-装备 cases\钓鱼-装备\ai_output.json
-```
-看到 **PASS** = 学会了！回到聊天室问它试试。
+**一条消息 = 一个问题 + 一个回答**。多教几个，它越来越懂你。
 
-> 💡 **不会写 JSON？** 复制 `cases\钓鱼-装备\expected.json` 改内容就行。
-> `suggestions` = 你想让它说的话，`evidence` = 照抄 input.txt 的原话。
+**然后测试**：
+```
+你> 新手钓鱼买什么装备
+梦新> 鱼竿+线组...（你教的）
+```
+
+> 💡 **不用写代码、不用建文件夹、不用碰文件**——全程对话。
+> 觉得 expected 格式麻烦？直接发 `input: 问题` 也行（它会记住问题，回答可以简单点）。
 
 ---
 
@@ -67,11 +46,11 @@ python verify.py cases\钓鱼-装备 cases\钓鱼-装备\ai_output.json
 
 ---
 
-## 📖 解压后看这些文档
+## 📖 更多
 
-- `TRAIN_GUIDE.md` — 完整训练手册
-- `USER_FAQS.md` — 常见问题
-- `ENGINEER_NOTES.md` — 开发者坑位
+- 删除不了？先关聊天室窗口（或 Ctrl+C），再删文件夹
+- 完整手册见解压后 `TRAIN_GUIDE.md`
+- 常见问题见 `USER_FAQS.md`
 
 ## 理念
 
