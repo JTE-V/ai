@@ -1,0 +1,20 @@
+{
+  "area": "性能",
+  "key_point": "网站加载慢",
+  "suggestions": [
+    "前端: 压缩图片/JS/CSS",
+    "后端: 加缓存(Redis)",
+    "网络: CDN 加速"
+  ],
+  "disclaimer": "仅供参考, 不构成专业意见",
+  "evidence": [
+    "网站加载慢怎么办"
+  ],
+  "unrelated": false,
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-工程师",
+    "latency_s": 0
+  },
+  "_from_case": "工程师-网站慢"
+}

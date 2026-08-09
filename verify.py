@@ -154,12 +154,15 @@ def main() -> None:
                             check_field(f"{key}[{i}].{k}", v, aa[k])
                 return
             en, an = [norm(x) for x in exp], [norm(x) for x in act]
+            # 宽松匹配: expected 项是实际项的子串(或反向)即算命中 — 用户写整句/分句都能过
+            def _hit(x, lst):
+                return any(x in a or a in x for a in lst)
             for x in en:
-                if x not in an:
-                    problems.append(f"[{case_name}] 字段 {key} 缺少期望项 {x!r} (实际: {an!r})")
+                if not _hit(x, an):
+                    problems.append(f"[{case_name}] 你的答案少了\"{x}\" (你教的是: {an!r}) — 去 expected.json 补上")
             for x in an:
-                if x not in en:
-                    problems.append(f"[{case_name}] 字段 {key} 出现多余项 {x!r} (期望: {en!r})")
+                if not _hit(x, en):
+                    problems.append(f"[{case_name}] 你的答案多了\"{x}\" (我只想要: {en!r}) — 去 expected.json 删掉")
             return
         # 标量：null 语义 / 值语义
         if exp is None:
@@ -169,7 +172,7 @@ def main() -> None:
                 )
         elif isinstance(exp, bool):
             if act is not exp:
-                problems.append(f"[{case_name}] 字段 {key} 值不匹配: 期望 {exp!r}, 实际 {act!r}")
+                problems.append(f"[{case_name}] {key} 答得不一样: 我想要 {exp!r}, 你给 {act!r} — 改 expected.json 或 input")
         elif isinstance(exp, str):
             if exp == "unknown":
                 if act not in ("unknown", None, ""):
@@ -182,10 +185,10 @@ def main() -> None:
                 if not norm(act):
                     problems.append(f"[{case_name}] 字段 {key} 为空 (id 至少写一个)")
             elif norm(act) != norm(exp):
-                problems.append(f"[{case_name}] 字段 {key} 值不匹配: 期望 {exp!r}, 实际 {act!r}")
+                problems.append(f"[{case_name}] {key} 答得不一样: 我想要 {exp!r}, 你给 {act!r} — 改 expected.json 或 input")
         elif isinstance(exp, (int, float)):
             if act != exp:
-                problems.append(f"[{case_name}] 字段 {key} 值不匹配: 期望 {exp!r}, 实际 {act!r}")
+                problems.append(f"[{case_name}] {key} 答得不一样: 我想要 {exp!r}, 你给 {act!r} — 改 expected.json 或 input")
         else:
             if act != exp:
                 problems.append(f"[{case_name}] 字段 {key} 不匹配: 期望 {exp!r}, 实际 {act!r}")

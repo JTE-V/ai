@@ -1,0 +1,20 @@
+{
+  "area": "英语",
+  "key_point": "英语入门",
+  "suggestions": [
+    "先学音标和字母",
+    "背最常用 500 词",
+    "每天听 10 分钟"
+  ],
+  "disclaimer": "仅供参考, 不构成专业意见",
+  "evidence": [
+    "英语零基础先学什么"
+  ],
+  "unrelated": false,
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-教师",
+    "latency_s": 0
+  },
+  "_from_case": "教师-学英语"
+}

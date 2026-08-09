@@ -1,0 +1,20 @@
+{
+  "area": "部署",
+  "key_point": "Flask部署",
+  "suggestions": [
+    "用 gunicorn 跑: gunicorn app:app",
+    "Nginx 反向代理",
+    "systemd 守护进程"
+  ],
+  "disclaimer": "仅供参考, 不构成专业意见",
+  "evidence": [
+    "怎么把 Flask 应用部署到服务器"
+  ],
+  "unrelated": false,
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-工程师",
+    "latency_s": 0
+  },
+  "_from_case": "工程师-Flask部署"
+}

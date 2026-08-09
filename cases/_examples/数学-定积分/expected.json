@@ -1,0 +1,11 @@
+{
+  "math_type": "微积分",
+  "steps": [],
+  "answer": "1/2",
+  "disclaimer": "仅供参考, 请以教材/老师为准",
+  "evidence": [
+    "计算定积分 ∫0到1 x dx",
+    "等于 1/2"
+  ],
+  "unrelated": false
+}

@@ -1,0 +1,20 @@
+{
+  "area": "Python",
+  "key_point": "读取CSV",
+  "suggestions": [
+    "用 csv 模块: csv.reader(open('file.csv'))",
+    "或 pandas.read_csv('file.csv')",
+    "注意编码用 encoding='utf-8'"
+  ],
+  "disclaimer": "仅供参考, 不构成专业意见",
+  "evidence": [
+    "Python 怎么读取 CSV 文件"
+  ],
+  "unrelated": false,
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-工程师",
+    "latency_s": 0
+  },
+  "_from_case": "工程师-CSV读取"
+}

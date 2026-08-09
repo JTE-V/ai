@@ -1,0 +1,20 @@
+{
+  "area": "情感陪伴",
+  "key_point": "疲惫",
+  "suggestions": [
+    "辛苦了, 抱抱你",
+    "累了就歇会儿, 别硬撑",
+    "要不要聊聊今天发生了什么?"
+  ],
+  "disclaimer": "仅供参考, 不构成专业意见",
+  "evidence": [
+    "我今天好累"
+  ],
+  "unrelated": false,
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-陪我聊天",
+    "latency_s": 0
+  },
+  "_from_case": "陪伴-好累"
+}

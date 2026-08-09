@@ -1,0 +1,37 @@
+{
+  "cve": "CVE-2024-66666",
+  "unrelated": false,
+  "affected_component": "Web",
+  "affected_versions": [
+    "UNKNOWN_RANGE"
+  ],
+  "cwe": null,
+  "cvss": null,
+  "public_exploit": "unknown",
+  "attack_vector": null,
+  "summary": "CVE-2024-66666: 某 Web 框架存在严重漏洞，攻击者可远程执行任意代码，影响所有版本。",
+  "evidence": [
+    "CVE-2024-66666: 某 Web 框架存在严重漏洞，攻击者可远程执行任意代码，影响所有版本。"
+  ],
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-v01",
+    "latency_s": 0
+  },
+  "_prosecutor": {
+    "confidence": {
+      "affected_component": "high",
+      "affected_versions": "low",
+      "cvss": "unknown",
+      "cwe": "unknown",
+      "cve": "high",
+      "attack_vector": "unknown",
+      "public_exploit": "low"
+    },
+    "corrections": {},
+    "low_keys": [
+      "affected_versions",
+      "public_exploit"
+    ]
+  }
+}

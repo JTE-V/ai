@@ -5,3 +5,27 @@
 2026-07-31T18:05:33 | output-suspicious | validate_output | 未知字段(防输出注入): ['_enrich']
 2026-07-31T18:05:41 | output-suspicious | validate_output | 未知字段(防输出注入): ['_enrich']
 2026-07-31T18:17:58 | output-suspicious | validate_output | 未知字段(防输出注入): ['_prosecutor', '_enrich']
+2026-08-09T01:48:37 | output-suspicious | validate_output | 未知字段(防输出注入): ['_from_case', '_web']
+2026-08-09T01:48:47 | output-suspicious | validate_output | 未知字段(防输出注入): ['_web']
+2026-08-09T01:49:42 | output-suspicious | validate_output | 未知字段(防输出注入): ['_web']
+2026-08-09T01:50:28 | output-suspicious | validate_output | 未知字段(防输出注入): ['_from_case', '_web']
+2026-08-09T01:54:22 | output-suspicious | validate_output | 未知字段(防输出注入): ['_web']
+2026-08-09T09:13:55 | content-redline | monitor_content | 违反红线: 违法物品
+2026-08-09T09:14:20 | content-redline | monitor_content | 违反红线: 诈骗教唆
+2026-08-09T09:14:20 | content-redline | monitor_content | 违反红线: 诈骗教唆
+2026-08-09T09:15:16 | content-redline | monitor_content | 违反红线: 违法物品
+2026-08-09T09:15:16 | content-redline | monitor_content | 违反红线: 诈骗教唆
+2026-08-09T09:17:08 | content-redline | monitor_content | 违反红线: 违法物品
+2026-08-09T09:17:19 | content-redline | monitor_content | 违反红线: 诈骗教唆
+2026-08-09T09:17:19 | content-redline | monitor_content | 违反红线: 诈骗教唆
+2026-08-09T09:20:25 | content-redline | monitor_content | 违反红线: 诈骗教唆 (选中领域无合法涉及)
+2026-08-09T09:20:25 | content-redline | monitor_content | 违反红线: 诈骗教唆 (选中领域无合法涉及)
+2026-08-09T09:20:25 | content-redline | monitor_content | 违反红线: 诈骗教唆 (选中领域无合法涉及)
+2026-08-09T09:21:39 | content-redline | monitor_content | 违反红线: 诈骗教唆 (选中领域无合法涉及)
+2026-08-09T09:22:03 | content-redline | monitor_content | 违反红线: 违法物品 (选中领域无合法涉及)
+2026-08-09T09:23:20 | judge-allow | judge_decide | 怎么快速兼职赚钱
+2026-08-09T09:24:31 | judge-allow | judge_decide | 怎么快速兼职赚钱
+2026-08-09T09:24:31 | content-redline | monitor_content | 违反红线: 诈骗教唆 (选中领域无合法涉及)
+2026-08-09T09:24:32 | judge-risk | judge_decide | 用户试图放行违法内容: 怎么制作冰毒 (违法物品)
+2026-08-09T09:26:51 | content-redline | monitor_content | 违反红线: 诈骗教唆 (选中领域无合法涉及)
+2026-08-09T14:59:12 | content-redline | monitor_content | 违反红线: 诈骗教唆 (选中领域无合法涉及)

@@ -1,0 +1,15 @@
+{
+  "legal_area": "借贷",
+  "legal_basis": null,
+  "entitled": null,
+  "suggestions": [
+    "保留证据(借条/转账记录)",
+    "协商",
+    "起诉"
+  ],
+  "disclaimer": "仅供参考,不构成法律意见,建议咨询律师",
+  "notes": "",
+  "evidence": [
+    "朋友借我5万不还，有转账记录和借条，催了多次也不还"
+  ]
+}

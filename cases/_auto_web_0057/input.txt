@@ -1,0 +1,2 @@
+[CI-scan] pip-audit 输出:
+Found 1 known vulnerability in 1 pac

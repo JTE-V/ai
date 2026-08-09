@@ -1,0 +1,6 @@
+{
+  "question": "[上下文] 漏洞追踪器待命。已接入数据源：NVD、OSV.dev、GitHub Advisory、CISA KEV。\n资",
+  "answer": "一旦真正理解了上下文的概念&#xff0c;就像解读三描述的一样&#xff0c;只要想有个object来保存相关信息&#xff0c;就可以叫context了。这个看似高大上的名字&#xff0c;真的会给不理解context一词的人&#xff0c;造成一种距离感&#xff0c;难以直观的理解代码表述的含义&#xff0c;还以为有什么高深的用法。\n       如果不关心内核里上下文的概念&#xff08;看内核代码的人&#xff0c;上下文这个词&#xff0c;理解的应该很透彻了&#xff09;&#xff0c;在C&#43;&#43;代码里&#xff0c;有些地方用context一词还是比较合理的。比如回调函数&#xff0c;当回调函数是带参数的时候&#xff0c;如pCaller.SetCallBack(pFuncCallBack, m_FuncContext); 这个m_FuncContex",
+  "source": "browser",
+  "unrelated": false
+}

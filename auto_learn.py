@@ -22,6 +22,7 @@
 """
 
 import json
+import re
 import subprocess
 import sys
 import time
@@ -107,6 +108,166 @@ def verify_and_heal(case_dir: Path) -> str:
         capture_output=True, text=True, encoding="utf-8",
     )
     return f"FAIL→heal(exited {hr.returncode})"
+
+
+# ============ 联网知识 → 记忆体 沉淀 (自动学习完整闭环) ============
+def _sink_web_cache_to_memory() -> int:
+    """把 web_cache/ 查到的知识沉淀进记忆体 knowledge/.
+    按领域分本子: 查询命中某领域案例 → 沉淀到 web-notes-<领域>.md; 否则通用 web-notes.md.
+    下次 chat 直接用, 不联网. 返回新增条数."""
+    import json as _json
+    from pathlib import Path as _P
+    here = _P(__file__).resolve().parent
+    cache_dir = here / "web_cache"
+    kb_dir = here.parent / "memory-body" / "knowledge"
+    kb_dir.mkdir(parents=True, exist_ok=True)
+    kb_file = kb_dir / "web-notes.md"
+    # 领域映射: 从 cases/ 现有领域名提取 (本子 = 领域文件夹)
+    domain_map = {}
+    cases_dir = here / "cases"
+    if cases_dir.exists():
+        for d in sorted(cases_dir.iterdir()):
+            if not d.name.startswith("_") and (d / "input.txt").exists():
+                try:
+                    txt = (d / "input.txt").read_text(encoding="utf-8")[:100]
+                    # 2-gram 关键词(中文连续不分词): "新手钓鱼" → {新手,手钓,钓鱼}
+                    _han = re.sub(r"[^\u4e00-\u9fff]", "", txt)
+                    domain_map[d.name] = [_han[i:i+2] for i in range(len(_han)-1)][:20]
+                except Exception:
+                    pass
+    seen = set()
+    if kb_file.exists():
+        for line in kb_file.read_text(encoding="utf-8").splitlines():
+            if line.startswith("## ") and ":" in line:
+                seen.add(line[3:].split(":")[0].strip())
+    added = 0
+    if cache_dir.exists():
+        for f in sorted(cache_dir.glob("*.json")):
+            try:
+                d = _json.loads(f.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if not d.get("found") or not d.get("data"):
+                continue
+            data = d.get("data") or {}
+            q = (data.get("query") or "").strip()
+            # 过滤非知识查询: 训练消息/个人信息/文件名格式 → 不污染知识库
+            if (not q or q in seen
+                    or "expected" in q or "input.txt" in q or "expected.json" in q
+                    or q.startswith(("我", "你", "我们"))
+                    or ":" in q[:10]):
+                continue
+            src = d.get("source") or "web"
+            if "summary" in data:
+                content = f"## {q}: {src}\n\n{data['summary']}\n"
+            elif "hits" in data:
+                lines = [f"## {q}: {src} (NVD)\n"]
+                for h in (data["hits"] or [])[:3]:
+                    lines.append(f"- {h.get('id')}: {(h.get('desc') or '')[:120]}")
+                content = "\n".join(lines) + "\n"
+            else:
+                content = f"## {q}: {src}\n\n{str(data)[:200]}\n"
+            # 按领域分本子: 查询词匹配某领域案例关键词 → 该领域文件
+            target_file = kb_file
+            _q_han = re.sub(r"[^\u4e00-\u9fff]", "", q)
+            _q_grams = {_q_han[i:i+2] for i in range(len(_q_han)-1)}
+            for dom, kws in domain_map.items():
+                if len(_q_grams & set(kws)) >= 1:
+                    target_file = kb_dir / f"web-notes-{dom}.md"
+                    break
+            with open(target_file, "a", encoding="utf-8") as kf:
+                kf.write(content)
+            # 同步自动生成案例 (用户零负担: AI 自己把查到的知识变成可复用案例)
+            try:
+                case_dir = here / "cases" / f"_auto_web_{len(seen):04d}"
+                case_dir.mkdir(exist_ok=True)
+                (case_dir / "input.txt").write_text(q, encoding="utf-8")
+                exp = {"question": q, "answer": (data.get("summary") or str(data))[:400],
+                       "source": src, "unrelated": False}
+                (case_dir / "expected.json").write_text(
+                    _json.dumps(exp, ensure_ascii=False, indent=2), encoding="utf-8")
+            except Exception:
+                pass
+            seen.add(q)
+            added += 1
+    if added:
+        print(f"  [auto_learn] 联网知识沉淀: +{added} 条 -> 记忆体+自动案例(用户零负担)")
+    return added
+
+
+# ============ 好奇心驱动学习 (无提示自主探索) ============
+# 不靠用户喂: 自己发现"知识缺口"→ 主动查 → 沉淀
+CURIOSITY_FILE = None  # 惰性初始化
+_CURIOSITY_SEEN = set()
+
+def _curiosity_queue() -> Path:
+    global CURIOSITY_FILE
+    if CURIOSITY_FILE is None:
+        here = Path(__file__).resolve().parent
+        CURIOSITY_FILE = here / "curiosity.txt"
+        if CURIOSITY_FILE.exists():
+            _CURIOSITY_SEEN.update(CURIOSITY_FILE.read_text(encoding="utf-8").splitlines())
+    return CURIOSITY_FILE
+
+def _discover_gaps() -> list[str]:
+    """发现知识缺口: ①memory-body gaps.md(查不到的记忆体缺口)
+                     ②web_cache里found=False的词(用户问过没找到)
+                     ③web-notes里提到的名词但未沉淀 ④NVD组件待查"""
+    import json as _json
+    here = Path(__file__).resolve().parent
+    gaps = []
+    # ① 记忆体缺口 gaps.md (查不到自动记的, 优先补)
+    gaps_md = here.parent / "memory-body" / "knowledge" / "gaps.md"
+    if gaps_md.exists():
+        for line in gaps_md.read_text(encoding="utf-8").splitlines():
+            m = re.search(r"\|\s*([^|]{2,30}?)\s*\|", line)
+            if m and m.group(1).strip() not in _CURIOSITY_SEEN:
+                gaps.append(m.group(1).strip())
+    # ② found=False 的缓存 (用户问过没答上 = 真实好奇缺口)
+    cache_dir = here / "web_cache"
+    if cache_dir.exists():
+        for f in sorted(cache_dir.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)[:50]:
+            try:
+                d = _json.loads(f.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if not d.get("found"):
+                q = (d.get("data") or {}).get("query") or ""
+                q = q.strip()
+                # 过滤用户个人信息/非知识词 (好奇只学知识缺口, 不学"我的xx")
+                if (2 <= len(q) <= 20 and q not in _CURIOSITY_SEEN
+                        and not re.search(r"^(我|你|我们)", q)
+                        and not re.search(r"[∫∑√π→=+×]", q)):
+                    gaps.append(q)
+    return gaps[:5]
+
+def _curiosity_learn(max_queries: int = 3) -> int:
+    """好奇学习: 发现缺口 → 联网查 → 沉淀. 返回新增沉淀条数."""
+    import run_model as _rm
+    qfile = _curiosity_queue()
+    gaps = [g for g in _discover_gaps() if g not in _CURIOSITY_SEEN][:max_queries]
+    if not gaps:
+        return 0
+    learned = 0
+    for q in gaps:
+        try:
+            r = _rm._web_lookup(q)
+            _CURIOSITY_SEEN.add(q)
+            if r.get("found"):
+                learned += 1
+                print(f"  [好奇] 自己发现并学会: {q} (来自 {r.get('source')})")
+            else:
+                print(f"  [好奇] 探索 {q}: 暂不可得({r.get('note')[:40]})")
+        except Exception as e:
+            print(f"  [好奇] {q} 探索异常: {type(e).__name__}", file=sys.stderr)
+        time.sleep(1)  # 礼貌限速
+    # 记录已探索 (防重复)
+    try:
+        with open(qfile, "a", encoding="utf-8") as f:
+            f.write("\n".join(gaps) + "\n")
+    except Exception:
+        pass
+    return learned
 
 
 def fetch_nvd_recent() -> list[dict]:
@@ -216,6 +377,13 @@ def main() -> None:
                 process_case(d)
                 seen.add(d.name)
             save_seen(seen)
+        # 完整闭环: 联网知识 → 记忆体沉淀(下次直接用, 不联网)
+        try:
+            _sink_web_cache_to_memory()
+            # 好奇心驱动: 无提示自主探索知识缺口
+            _curiosity_learn(max_queries=3)
+        except Exception as e:
+            print(f"  [auto_learn] 沉淀失败: {e}", file=sys.stderr)
         if once:
             break
         time.sleep(interval)

@@ -1,0 +1,26 @@
+{
+  "area": null,
+  "key_point": null,
+  "suggestions": [],
+  "disclaimer": "仅供参考, 不构成专业意见",
+  "evidence": [
+    "这是宠物顾问的示例输入",
+    "替换成你的真实内容"
+  ],
+  "unrelated": false,
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-宠物顾问",
+    "latency_s": 0
+  },
+  "_from_case": "宠物顾问-示例",
+  "notes": "[web] (结果列表, 页面抓取受限) (来源: browser(bing))",
+  "_web": {
+    "source": "browser(bing)",
+    "fields_tried": [
+      "area",
+      "key_point",
+      "suggestions"
+    ]
+  }
+}

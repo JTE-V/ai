@@ -1,0 +1,25 @@
+{
+ "cve": "CVE-2024-66666",
+ "unrelated": false,
+ "affected_component": "某 Web 框架",
+ "affected_versions": [
+  "所有版本"
+ ],
+ "cwe": null,
+ "cvss": null,
+ "public_exploit": "unknown",
+ "attack_vector": "network",
+ "summary": "某 Web 框架存在严重漏洞，攻击者可远程执行任意代码，影响所有版本。",
+ "evidence": [
+  "某 Web 框架存在严重漏洞，攻击者可远程执行任意代码，影响所有版本。"
+ ],
+ "meta": {
+  "provider": "openai-compatible",
+  "model": "deepseek-v4-flash",
+  "tokens": {
+   "prompt_tokens": 4841,
+   "completion_tokens": 128,
+   "total_tokens": 4969
+  }
+ }
+}

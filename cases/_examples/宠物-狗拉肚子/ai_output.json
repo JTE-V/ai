@@ -1,0 +1,49 @@
+{
+  "cve": null,
+  "unrelated": false,
+  "affected_component": "unknown_component",
+  "affected_versions": [
+    "UNKNOWN_RANGE"
+  ],
+  "cwe": null,
+  "cvss": null,
+  "public_exploit": "unknown",
+  "attack_vector": null,
+  "summary": "我家狗拉肚子怎么办？",
+  "evidence": [
+    "我家狗拉肚子怎么办？"
+  ],
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-v01",
+    "latency_s": 0
+  },
+  "_from_case": "宠物-狗拉肚子",
+  "_prosecutor": {
+    "confidence": {
+      "affected_component": "low",
+      "affected_versions": "low",
+      "cvss": "unknown",
+      "cwe": "unknown",
+      "cve": "unknown",
+      "attack_vector": "unknown",
+      "public_exploit": "low"
+    },
+    "corrections": {},
+    "low_keys": [
+      "affected_component",
+      "affected_versions",
+      "public_exploit"
+    ]
+  },
+  "notes": "[web] [视频] 蔡依林MV《我》官方完整版_哔哩哔哩_bilibili — 打开链接观看: https://www.bilibili.com/video/BV1rx411S7WH/ (来源: browser(bing))",
+  "_web": {
+    "source": "browser(bing)",
+    "fields_tried": [
+      "cve",
+      "cwe",
+      "cvss",
+      "attack_vector"
+    ]
+  }
+}

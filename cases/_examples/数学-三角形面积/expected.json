@@ -1,0 +1,11 @@
+{
+  "math_type": "几何",
+  "steps": [],
+  "answer": "12",
+  "disclaimer": "仅供参考, 请以教材/老师为准",
+  "evidence": [
+    "求三角形面积",
+    "底6高4"
+  ],
+  "unrelated": false
+}

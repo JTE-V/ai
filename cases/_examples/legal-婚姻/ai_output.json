@@ -1,0 +1,49 @@
+{
+  "cve": null,
+  "unrelated": false,
+  "affected_component": "unknown_component",
+  "affected_versions": [
+    "UNKNOWN_RANGE"
+  ],
+  "cwe": null,
+  "cvss": null,
+  "public_exploit": "unknown",
+  "attack_vector": null,
+  "summary": "结婚3年，现在要离婚，房子是婚后一起买的，怎么分？",
+  "evidence": [
+    "结婚3年，现在要离婚，房子是婚后一起买的，怎么分？"
+  ],
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-v01",
+    "latency_s": 0
+  },
+  "_from_case": "legal-婚姻",
+  "_prosecutor": {
+    "confidence": {
+      "affected_component": "low",
+      "affected_versions": "low",
+      "cvss": "unknown",
+      "cwe": "unknown",
+      "cve": "unknown",
+      "attack_vector": "unknown",
+      "public_exploit": "low"
+    },
+    "corrections": {},
+    "low_keys": [
+      "affected_component",
+      "affected_versions",
+      "public_exploit"
+    ]
+  },
+  "notes": "[web] (结果列表, 页面抓取受限) (来源: browser(bing))",
+  "_web": {
+    "source": "browser(bing)",
+    "fields_tried": [
+      "cve",
+      "cwe",
+      "cvss",
+      "attack_vector"
+    ]
+  }
+}

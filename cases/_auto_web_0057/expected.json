@@ -1,0 +1,6 @@
+{
+  "question": "[CI-scan] pip-audit 输出:\nFound 1 known vulnerability in 1 pac",
+  "answer": "Jenkins&#xff1a;开源自动化服务器&#xff0c;功能丰富 Jenkins X&#xff1a;基于 Jenkins 的云原生 CI/CD 解决方案 Spinnaker&#xff1a;多云环境下的持续交付平台 # .gitlab-ci.yml\n\nstages:\n\n- build\n\n- test\n\n- deploy\n\n# 构建阶段\n\nbuild:\n\nstage: build\n\nimage: maven:3.8.4-openjdk-17\n\nscript:\n\n- mvn clean package\n\nartifacts:\n\npaths:\n\n- target/*.jar\n\n# 测试阶段\n\ntest:\n\nstage: test\n\nimage: maven:3.8.4-openjdk-17\n\nscript:\n\n- mvn test\n\nneeds:\n\n- build\n\n# 部署阶段\n\ndepl",
+  "source": "browser",
+  "unrelated": false
+}

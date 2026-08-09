@@ -94,6 +94,116 @@ def sanitize(text: str) -> tuple[str, list[str]]:
     return text, warnings
 
 
+# ============ 内容红线监测 (用户输出/回答, 联网核实, 不违反红线才放行) ============
+REDLINE_KEYWORDS = [
+    (r"冰毒|海洛因|制毒|摇头丸|买卖枪支|军火交易|暗网购买", "违法物品"),
+    (r"教人杀人|怎么杀人|伤害他人|绑架计划|勒索方法", "暴力教唆"),
+    (r"炸弹制作|自制炸药|危险品制造", "危险品"),
+    (r"未成年[^。！？]{0,10}色情|儿童色情", "非法内容"),
+    (r"刷单返利教程|诈骗话术模板|杀猪盘剧本|骗人方法|怎么骗人|骗钱|行骗|诈骗教程|教我骗人|教人诈骗|怎么诈骗|请教[^。！？]{0,6}骗|请问[^。！？]{0,6}骗|求教[^。！？]{0,6}骗|怎么行骗|诈骗手法|骗术", "诈骗教唆"),
+    (r"盗号|木马制作|入侵他人系统", "非法入侵"),
+]
+VERIFY_KEYWORDS = [r"兼职赚钱|快速致富|稳赚不赔|内部渠道|点击领取"]
+
+
+def monitor_content(text: str, verify_online: bool = True, active_domains: set | None = None) -> dict:
+    """内容红线监测: 红线词拦截(领域联动) + 可疑联网核实.
+    active_domains: 用户选中的领域. 红线内容默认必拦; 仅当选中领域是合法涉及类
+    (如"反诈骗咨询/防骗指南")才可放行 — 正常职业(教师/美食)出现红线内容=必拦.
+    返回 {ok, block, verify, reasons} — ok=False 则不放行."""
+    result = {"ok": True, "block": False, "verify": False, "reasons": []}
+    # 合法涉及红线主题的领域白名单(用户训练这类领域才可能涉及红线词)
+    LEGAL_DOMAINS = ("反诈骗", "防骗", "反诈", "安全咨询", "法律")
+    # 1. 红线词 (命中 → 检查领域是否合法涉及)
+    for pat, label in REDLINE_KEYWORDS:
+        if re.search(pat, text):
+            # 领域联动: 选中的领域是合法涉及类 → 放行(教学/咨询场景); 否则必拦
+            domains = active_domains if active_domains is not None else set()
+            if domains and any(d in dom for dom in domains for d in LEGAL_DOMAINS):
+                continue  # 合法领域(如反诈骗咨询)可涉及
+            result["ok"] = False
+            result["block"] = True
+            result["reasons"].append(f"违反红线: {label} (选中领域无合法涉及)")
+    if result["block"]:
+        _log("content-redline", "monitor_content", "; ".join(result["reasons"]))
+        return result
+    # 2. 可疑内容 → 交法官裁决(不自动拦, 不做自主决策=红线1)
+    for pat in VERIFY_KEYWORDS:
+        if re.search(pat, text):
+            result["verify"] = True
+            result["judge"] = True  # 标记: 交法官
+            result["ok"] = True      # 不自动拦, 放行给用户裁决
+            result["reasons"].append("可疑内容, 已交法官裁决")
+            submit_to_judge(text, result["reasons"])
+            break
+    return result
+
+
+# ============ 法官机制 (可疑内容交用户裁决, 不做自主决策=红线1) ============
+JUDGE_FILE = None
+
+
+def _judge_path():
+    """法官待裁决队列文件(持久)."""
+    global JUDGE_FILE
+    if JUDGE_FILE is None:
+        JUDGE_FILE = HERE / "judge_queue.json"
+    return JUDGE_FILE
+
+
+def submit_to_judge(text: str, reasons: list[str]) -> None:
+    """可疑内容交法官(用户)裁决 — 不自动拦, 记录待裁决."""
+    import json as _json
+    p = _judge_path()
+    queue = []
+    if p.exists():
+        try:
+            queue = _json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            queue = []
+    queue.append({"text": text, "reasons": reasons,
+                  "time": __import__("time").strftime("%Y-%m-%d %H:%M"), "status": "pending"})
+    p.write_text(_json.dumps(queue, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def judge_queue() -> list:
+    """待裁决队列."""
+    import json as _json
+    p = _judge_path()
+    if p.exists():
+        try:
+            return _json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+    return []
+
+
+def judge_decide(index: int, decision: str) -> str:
+    """用户(法官)裁决: 放行(allow) / 拦截(block).
+    ⚠️ 防违法意图: 裁决'放行'时二次红线检查 — 明确红线内容不允许放行(强制拦截+记风险)."""
+    import json as _json
+    q = judge_queue()
+    if index < 0 or index >= len(q):
+        return f"裁决失败: 队列里没有第 {index} 条"
+    item = q[index]
+    # 防违法意图: 放行前二次红线检查(用户可能想放行违法内容)
+    if decision == "allow":
+        for pat, label in REDLINE_KEYWORDS:
+            if re.search(pat, item["text"]):
+                item["status"] = "blocked_by_system"
+                item["risk"] = "用户试图放行违法内容"
+                q[index] = item
+                _judge_path().write_text(_json.dumps(q, ensure_ascii=False, indent=2), encoding="utf-8")
+                _log("judge-risk", "judge_decide", f"用户试图放行违法内容: {item['text'][:50]} ({label})")
+                return f"⚠️ 系统拒绝放行(违法内容不允许): {label} — 已记录风险。{item['text'][:40]}"
+    item["status"] = decision
+    item["decided_time"] = __import__("time").strftime("%Y-%m-%d %H:%M")
+    q[index] = item
+    _judge_path().write_text(_json.dumps(q, ensure_ascii=False, indent=2), encoding="utf-8")
+    _log(f"judge-{decision}", "judge_decide", item["text"][:60])
+    return f"已{('放行' if decision == 'allow' else '拦截')}: {item['text'][:40]}"
+
+
 def validate_output(obj) -> tuple[bool, list[str]]:
     """输出验证: JSON 结构/字段白名单/类型,返回(是否通过, 问题列表)。"""
     problems = []

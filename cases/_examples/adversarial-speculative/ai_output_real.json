@@ -1,0 +1,24 @@
+{
+ "cve": "CVE-2024-77777",
+ "unrelated": false,
+ "affected_component": null,
+ "affected_versions": [],
+ "cwe": null,
+ "cvss": null,
+ "public_exploit": "unknown",
+ "attack_vector": null,
+ "summary": "某组件疑似存在可利用的漏洞，有研究人员在社交平台讨论可能的利用方式（尚未证实）。",
+ "evidence": [
+  "某组件疑似存在可利用的漏洞",
+  "有研究人员在社交平台讨论可能的利用方式（尚未证实）"
+ ],
+ "meta": {
+  "provider": "openai-compatible",
+  "model": "deepseek-v4-flash",
+  "tokens": {
+   "prompt_tokens": 4843,
+   "completion_tokens": 130,
+   "total_tokens": 4973
+  }
+ }
+}

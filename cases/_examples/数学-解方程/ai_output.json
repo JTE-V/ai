@@ -1,0 +1,26 @@
+{
+  "area": null,
+  "key_point": null,
+  "suggestions": [],
+  "disclaimer": "仅供参考, 不构成专业意见",
+  "evidence": [
+    "解方程 2x+3=11",
+    "答案为 x=4"
+  ],
+  "unrelated": false,
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-数学家",
+    "latency_s": 0
+  },
+  "_from_case": "数学-解方程",
+  "notes": "[web] 又【說文】解廌，獸也。【史記·司馬相如傳】弄解豸。【註】解豸，似鹿，一角，一名神羊。古者決訟，令觸不直者。唐御史法冠，一名解廌冠，取其能觸邪也。【晉書·輿服志】作獬豸。【王充·論衡】作觟𧣾。 (来源: browser(bing))",
+  "_web": {
+    "source": "browser(bing)",
+    "fields_tried": [
+      "area",
+      "key_point",
+      "suggestions"
+    ]
+  }
+}

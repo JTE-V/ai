@@ -1,0 +1,6 @@
+{
+  "question": "网络安全是什么",
+  "answer": "例如，美国NIST（National Institute of Standards and Technology，国家标准及技术研究院）发布的网络安全框架IPDRR，就是当前企业与组织广泛遵循的框架。IPDRR分别代表识别（Identify）、防护（Protect）、检测（Detect）、响应（Respond）、恢复（Recover），是该框架定义的5大核心能力。IPDRR从面向安全防护的模型转化为面向预防和业务连续性管理的模型，变被动为主动，最终提供自适应的网络安全能力。",
+  "source": "browser",
+  "unrelated": false
+}

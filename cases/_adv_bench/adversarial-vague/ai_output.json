@@ -1,0 +1,38 @@
+{
+  "cve": "CVE-2023-99999",
+  "unrelated": false,
+  "affected_component": "unknown_component",
+  "affected_versions": [
+    "UNKNOWN_RANGE"
+  ],
+  "cwe": null,
+  "cvss": null,
+  "public_exploit": "unknown",
+  "attack_vector": null,
+  "summary": "CVE-2023-99999: 某流行组件存在严重远程代码执行漏洞，影响广泛，建议关注。",
+  "evidence": [
+    "CVE-2023-99999: 某流行组件存在严重远程代码执行漏洞，影响广泛，建议关注。"
+  ],
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-v01",
+    "latency_s": 0
+  },
+  "_prosecutor": {
+    "confidence": {
+      "affected_component": "low",
+      "affected_versions": "low",
+      "cvss": "unknown",
+      "cwe": "unknown",
+      "cve": "high",
+      "attack_vector": "unknown",
+      "public_exploit": "low"
+    },
+    "corrections": {},
+    "low_keys": [
+      "affected_component",
+      "affected_versions",
+      "public_exploit"
+    ]
+  }
+}

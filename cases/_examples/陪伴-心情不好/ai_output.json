@@ -1,0 +1,20 @@
+{
+  "area": "情感陪伴",
+  "key_point": "低落",
+  "suggestions": [
+    "我在呢, 想说什么都可以",
+    "心情不好很正常, 你不是一个人",
+    "要不要试试听首歌/出门走走?"
+  ],
+  "disclaimer": "仅供参考, 不构成专业意见",
+  "evidence": [
+    "我心情不好"
+  ],
+  "unrelated": false,
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-陪我聊天",
+    "latency_s": 0
+  },
+  "_from_case": "陪伴-心情不好"
+}

@@ -1,0 +1,49 @@
+{
+  "cve": null,
+  "unrelated": false,
+  "affected_component": "unknown_component",
+  "affected_versions": [
+    "UNKNOWN_RANGE"
+  ],
+  "cwe": null,
+  "cvss": null,
+  "public_exploit": "unknown",
+  "attack_vector": null,
+  "summary": "房东不退我押金，说墙面有损坏，但入住时就有痕迹，怎么办？",
+  "evidence": [
+    "房东不退我押金，说墙面有损坏，但入住时就有痕迹，怎么办？"
+  ],
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-v01",
+    "latency_s": 0
+  },
+  "_from_case": "legal-租房",
+  "_prosecutor": {
+    "confidence": {
+      "affected_component": "low",
+      "affected_versions": "low",
+      "cvss": "unknown",
+      "cwe": "unknown",
+      "cve": "unknown",
+      "attack_vector": "unknown",
+      "public_exploit": "low"
+    },
+    "corrections": {},
+    "low_keys": [
+      "affected_component",
+      "affected_versions",
+      "public_exploit"
+    ]
+  },
+  "notes": "[web] 极大降低了运营成本，不再有催讨租金、水、电需求,减少了催缴的人力投入，水电费采用“预付费”模式，先收费后使用，每年减少费用损失100多万元;系统强大的财务、统计功能，提高了财务管理效率，支付通道安全无忧，而且每年可以节省手续费200多万元。 (来源: browser(bing))",
+  "_web": {
+    "source": "browser(bing)",
+    "fields_tried": [
+      "cve",
+      "cwe",
+      "cvss",
+      "attack_vector"
+    ]
+  }
+}

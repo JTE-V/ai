@@ -26,6 +26,8 @@
 
 规则：
 - 原文没有的信息一律填 null 或 unknown，禁止推测补全。
+- attack_vector 等枚举字段：仅当原文**明确表述**攻击向量（如"通过网络远程利用"）才填；
+  间接线索（"远程执行"暗示 network）不得推断填入——推断不是事实（E10）。
 - cvss 是数字字段：原文没有给出 CVSS 分数 → 必须填 null。0.0 不是"未知"，0.0 会被判卷当成编造。
 - attack_vector 必须原文明确写出攻击途径（出现 network / adjacent / local / physical 等词）才填；仅根据"attacker controlled"、"execute arbitrary code"等表述推断攻击途径 = 背景知识污染，必须填 null。
 - 如果输入不是漏洞情报（无关内容、广告、报错页），输出 {"unrelated": true, "cve": null}。

@@ -1,0 +1,11 @@
+{
+  "math_type": "方程",
+  "steps": [],
+  "answer": "x=4",
+  "disclaimer": "仅供参考, 请以教材/老师为准",
+  "evidence": [
+    "解方程 2x+3=11",
+    "答案为 x=4"
+  ],
+  "unrelated": false
+}

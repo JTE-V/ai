@@ -1,0 +1,2 @@
+[上下文] 漏洞追踪器待命。已接入数据源：NVD、OSV.dev、GitHub Advisory、CISA KEV。
+资

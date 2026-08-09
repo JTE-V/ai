@@ -1,0 +1,49 @@
+{
+  "cve": null,
+  "unrelated": false,
+  "affected_component": "unknown_component",
+  "affected_versions": [
+    "UNKNOWN_RANGE"
+  ],
+  "cwe": null,
+  "cvss": null,
+  "public_exploit": "unknown",
+  "attack_vector": null,
+  "summary": "计算定积分 ∫0到1 x dx，等于 1/2。",
+  "evidence": [
+    "计算定积分 ∫0到1 x dx，等于 1/2。"
+  ],
+  "meta": {
+    "provider": "mengxin-arch",
+    "model": "rule-extract-v01",
+    "latency_s": 0
+  },
+  "_from_case": "数学-定积分",
+  "_prosecutor": {
+    "confidence": {
+      "affected_component": "low",
+      "affected_versions": "low",
+      "cvss": "unknown",
+      "cwe": "unknown",
+      "cve": "unknown",
+      "attack_vector": "unknown",
+      "public_exploit": "low"
+    },
+    "corrections": {},
+    "low_keys": [
+      "affected_component",
+      "affected_versions",
+      "public_exploit"
+    ]
+  },
+  "notes": "[web] 计算机Windows系统计算器\t\r\n\t计算机Windows系统自带的计算器分为标准型、科学型、程序员、统计信息四种版本。注意切换不同版本时，会清除当前的计算信息。但会保留“记忆钥匙”所存储的计算历史记录和数字。Windows计算器打开方法：1. 开始-运行-输入\"calc\"打开；2. 开始-程序-附件-计算器。 (来源: browser(bing))",
+  "_web": {
+    "source": "browser(bing)",
+    "fields_tried": [
+      "cve",
+      "cwe",
+      "cvss",
+      "attack_vector"
+    ]
+  }
+}
