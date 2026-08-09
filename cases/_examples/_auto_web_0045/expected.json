@@ -1,6 +1,0 @@
-{
-  "question": "种子1: 人生意义（已建 PASS）",
-  "answer": "打开种子地图的高级设置（齿轮图标）并开启世界边界，然后设置中心点和半径。地图会将可玩区域绘制为正方形（与 Java 版的 /worldborder 一致）或圆形，并附带随平移和缩放实时更新的方块尺寸读数。点击复制按钮即可获得精确的 /worldborder center 和 /worldborder set 命令，用于在你的世界中重建同样的边界。基岩版没有原版 /worldborder 命令，因此在基岩版中边界仅用于规划显示。",
-  "source": "browser",
-  "unrelated": false
-}

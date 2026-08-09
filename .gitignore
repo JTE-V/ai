@@ -1,8 +1,0 @@
-__pycache__/
-*.pyc
-cases/_chat_tmp/
-cases/_auto_pending/
-web_cache/
-nvd_cache/
-active_domains.txt
-judge_queue.json

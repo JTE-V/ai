@@ -1,9 +1,0 @@
-[CI-scan] pip-audit 输出:
-Found 1 known vulnerability in 1 package
-Package  Version  Vulnerability         Fix Version
--------  -------  --------------------  -----------
-jinja2   3.1.2    CVE-2024-34064 (high)  >=3.1.3
-
-[assets] 当前资产清单:
-- api-server   (critical_asset, internet_facing)  uses jinja2==3.1.2
-- worker       (internal)                        uses jinja2==3.1.4

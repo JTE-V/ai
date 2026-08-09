@@ -1,3 +1,0 @@
-[上下文] 漏洞追踪器待命。已接入数据源：NVD、OSV.dev、GitHub Advisory、CISA KEV。
-资产清单：api-server (internet_facing, critical_asset, jinja2==3.1.2)、worker (internal, jinja2==3.1.4)。
-最近 24 小时：无新公告、无扫描异常、无事件输入。
